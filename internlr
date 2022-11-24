@@ -1,0 +1,20 @@
+mkdir $2
+cd $2
+cp $1 protein.fasta
+cat protein.fasta | tr ' ' '_' > protein_underscore.fasta
+rm protein.fasta
+$IPS_PATH/interproscan.sh -i protein_underscore.fasta -b ips_temp -appl COILS,Pfam,Gene3D
+rm protein_underscore.fasta
+cut -f1 ips_temp.tsv | sort -u > gene.list
+cut -f1,6,7,8,13 ips_temp.tsv > ips_temp_short.tsv
+rm ips_temp.*
+cp $INTERNLR_PATH/domain_caller.py domain_caller.py
+python3 domain_caller.py
+rm domain_caller.py
+rm ips_temp_short.tsv
+rm gene.list
+cut -f1 domains.txt | sort -u > domains_gene.list
+cp $INTERNLR_PATH/nlr_caller.py nlr_caller.py
+python3 nlr_caller.py
+rm domains_gene.list
+rm nlr_caller.py
